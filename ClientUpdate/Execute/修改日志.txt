@@ -1,0 +1,4 @@
+V1.0.58.903
+ +配置文件中增加服务器信息配置 DataBaseIP=127.0.0.1，DataBaseName=checkjs
+v1.0.57.425
+ *更换程序图标

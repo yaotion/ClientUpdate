@@ -1,0 +1,141 @@
+unit uAutoUpdate;
+
+interface
+
+uses
+  IdHTTP,superobject;
+type
+  //文件类型
+  TRsFileType = (ftCommFile{普通文件},ftMainFile{主程序},ftRegFile{注册文件},ftDBFile{数据库文件});
+
+  //升级信息
+  RRsUpdateInfo = record
+    //是否需要升级
+    bNeedUpdate: boolean;
+    //可升级版本号
+    strProjectVersion: string;
+    //摘要，升级信息
+    strUpdateBrief: string;
+    //可升级包URL
+    strPackageUrl: string;
+    //可执行程序名
+    strMainExeName: string;
+  end;
+
+  //补丁信息
+  RRsFileInfo = record
+    //文件名
+    strFileName: string;
+    //文件类型
+    FileType: TRsFileType;
+    //MD5
+    strFileMD5: string;
+    //更新时是否备份
+    bBackup: boolean;
+    //是否更新成功
+    bUpdate: boolean;
+  end;    
+  TRsFileInfoArray = array of RRsFileInfo;
+
+  //更新配置信息
+  RRsUpdateConfig = record
+    //更新的web接口地址
+    APIUrl  : string;
+    //项目ID
+    ProjectID : string;
+    //项目版本
+    ProjectVersion : string;
+    //主程序名称
+    MainExeName : string;
+  end;
+  ///自动更新工具类
+  TAutoUpdateUtils = class
+  public
+    //获取指定项目指定版本的可用更新信息
+    class function GetUpdateInfo(APIUrl,strProjectID, strProjectVersion: string;
+      out UpdateInfo : RRsUpdateInfo ) : boolean;
+    //获取配置文件中的更新配置信息
+    class function GetUpdateConfig(ConfigName : string; out UpdateConfig : RRsUpdateConfig) : boolean;
+  end;
+const
+  //签到方式
+  TRsFileTypeName: array[TRsFileType] of string = ('普通文件','主程序','注册文件','数据库文件');
+
+  //函数定义
+  function FileTypeNameToType(strName: string): TRsFileType;
+implementation
+uses
+  SysUtils;
+
+function FileTypeNameToType(strName: string): TRsFileType;
+var
+  FileType: TRsFileType;
+begin
+  Result := ftCommFile;
+  for FileType := Low(TRsFileType) to High(TRsFileType) do
+  begin
+    if TRsFileTypeName[FileType] = strName then
+    begin
+      Result := FileType;
+      Break;
+    end;
+  end;
+end;
+
+{ TAutoUpdateUtils }
+
+class function TAutoUpdateUtils.GetUpdateConfig(ConfigName: string;
+  out UpdateConfig: RRsUpdateConfig): boolean;
+var
+  Ini: TIniFile;
+begin
+  Ini := TIniFile.Create(ExtractFilePath(Application.ExeName) + 'Update.ini');
+  try                                                             
+    m_UpdateConfig.APIUrl := Trim(Ini.ReadString('SysConfig', 'GetNewVersionUrl', ''));
+    m_UpdateConfig.ProjectID := Trim(Ini.ReadString('SysConfig', 'ProjectID', ''));
+    m_UpdateConfig.ProjectVersion := Trim(Ini.ReadString('SysConfig', 'ProjectVersion', ''));
+    m_UpdateConfig.MainExeName := Trim(Ini.ReadString('SysConfig', 'MainExeName', ''));
+  finally
+    Ini.Free();
+  end;
+end;
+
+class function TAutoUpdateUtils.GetUpdateInfo(APIUrl,strProjectID,
+  strProjectVersion: string; out UpdateInfo: RRsUpdateInfo): boolean;
+var
+  IdHTTP: TIdHTTP;
+  iJSON: ISuperObject;
+  strUrl, strUpdateInfo: string;
+begin
+  result := false;
+  UpdateInfo.bNeedUpdate := false;
+  strUrl := APIUrl + Format('?pid=%s&version=%s', [strProjectID, strProjectVersion]);
+  IdHTTP := TIdHTTP.Create(nil);
+  try
+    IdHTTP.Disconnect;
+    IdHTTP.Request.Pragma := 'no-cache';
+    IdHTTP.Request.CacheControl := 'no-cache';
+    IdHTTP.Request.Connection := 'close';
+    IdHTTP.ReadTimeout := 1000;
+    IdHTTP.ConnectTimeout := 1000;
+    strUpdateInfo := IdHTTP.Get(strUrl);
+    strUpdateInfo := Utf8ToAnsi(strUpdateInfo);
+    IdHTTP.Disconnect;
+  finally
+    IdHTTP.Free;
+  end;
+  if strUpdateInfo = '' then exit;
+
+  //===这一行语句测试用，正式应用中删除
+  //strUpdateInfo := '{"NeedUpdate":true,"strProjectVersion":"1.2","strUpdateBrief":"运安升级包1.2版","strPackageUrl":"http://192.168.10.231/AutoUpdate/2301001201310252212231.rar","strMainExeName":"RunSafty.exe"}';
+  iJSON := SO(strUpdateInfo);
+  UpdateInfo.bNeedUpdate := iJSON.B['NeedUpdate'];
+  UpdateInfo.strProjectVersion := Trim(iJSON.S['strProjectVersion']);
+  UpdateInfo.strUpdateBrief := Trim(iJSON.S['strUpdateBrief']);
+  UpdateInfo.strPackageUrl := Trim(iJSON.S['strPackageUrl']);
+  UpdateInfo.strMainExeName := Trim(iJSON.S['strMainExeName']);
+  iJSON := nil;
+  result := true;
+end;
+
+end.

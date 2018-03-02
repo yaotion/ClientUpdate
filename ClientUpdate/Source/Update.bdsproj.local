@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2013-09-04 10:31:28.796.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uTrainType.pas</Transaction>
+    <Transaction>2013-09-05 11:14:06.437.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\测酒记录查询\uFrmDrinkTestQuery.pas</Transaction>
+    <Transaction>2013-09-05 11:14:06.437.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.dfm=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\测酒记录查询\uFrmDrinkTestQuery.dfm</Transaction>
+    <Transaction>2013-09-05 11:37:40.718.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uSystemDict.pas</Transaction>
+    <Transaction>2013-09-05 11:45:29.062.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能单元\数据库操作\系统字典\uDBSystemDict.pas</Transaction>
+    <Transaction>2013-09-05 12:11:53.718.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uDrink.pas</Transaction>
+    <Transaction>2013-09-05 12:17:53.312.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能单元\数据库操作\测酒记录\uDBDrink.pas</Transaction>
+    <Transaction>2013-09-05 16:28:57.203.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\uFrmMain_RenYuan.pas=</Transaction>
+    <Transaction>2013-09-05 16:28:57.203.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\uFrmMain_RenYuan.dfm=</Transaction>
+    <Transaction>2013-09-05 16:39:05.750.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\师徒关系管理\uFrmXYRelation.pas</Transaction>
+    <Transaction>2013-09-05 16:39:05.750.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.dfm=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\师徒关系管理\uFrmXYRelation.dfm</Transaction>
+    <Transaction>2013-09-05 16:47:10.343.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uXYRelation.pas</Transaction>
+    <Transaction>2013-09-05 16:56:45.484.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能单元\数据库操作\师徒关系\uDBXYRelation.pas</Transaction>
+    <Transaction>2013/09/18 10:43:27.260.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能单元\网络操作函数\uRSSocket.pas=</Transaction>
+    <Transaction>2013/09/18 10:45:54.713.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能单元\Web服务引用\uIRunSafty.pas=</Transaction>
+    <Transaction>2013/09/18 10:56:13.370.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uDBConfig.pas=</Transaction>
+    <Transaction>2013/09/18 11:14:28.468.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\数据定义\uWebServiceType.pas=</Transaction>
+    <Transaction>2013/09/18 11:19:15.166.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\通用线程\uTFCommonThread.pas=</Transaction>
+    <Transaction>2013/09/18 14:32:09.831.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\公共\功能单元\Http通信\uWorkEventUpload.pas=</Transaction>
+    <Transaction>2013/09/22 16:19:05.711.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\通用功能\选择派班室\uFrmSelectSite.pas=</Transaction>
+    <Transaction>2013/09/22 16:19:05.711.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\通用功能\选择派班室\uFrmSelectSite.dfm=</Transaction>
+    <Transaction>2013/09/22 16:21:59.477.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\读取IC卡\ufrmReadICCarInfo.pas=</Transaction>
+    <Transaction>2013/09/22 16:21:59.477.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\读取IC卡\ufrmReadICCarInfo.dfm=</Transaction>
+    <Transaction>2013/09/26 13:27:37.130.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\劳时显示\ufrmShowWorkTime.pas=</Transaction>
+    <Transaction>2013/09/26 13:27:37.130.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\劳时显示\ufrmShowWorkTime.dfm=</Transaction>
+    <Transaction>2013/09/27 12:45:49.598.pas,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.pas=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\司机报单\uFrmWorkTime.pas</Transaction>
+    <Transaction>2013/09/27 12:45:49.598.dfm,E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\Unit3.dfm=E:\姚新\畅想自动化\软件项目\出退勤安全卡控系统\04_软件工程\02_开发\运安系统\客户端\Source\功能窗口\司机报单\uFrmWorkTime.dfm</Transaction>
+    <Transaction>2013-10-10 10:09:24.750.bdsproj,E:\运安系统\指导队签到\Source\RunSafty.bdsproj=E:\运安系统\指导队签到\Source\GuideSign.bdsproj</Transaction>
+    <Transaction>2013-10-10 12:33:21.281.pas,E:\运安系统\指导队签到\Source\功能窗口\请销假\请假登记\uFrmAskLeave.pas=E:\运安系统\指导队签到\Source\功能窗口\请销假\请假登记\uFrmGuideSign.pas</Transaction>
+    <Transaction>2013-10-10 12:33:21.281.dfm,E:\运安系统\指导队签到\Source\功能窗口\请销假\请假登记\uFrmAskLeave.dfm=E:\运安系统\指导队签到\Source\功能窗口\请销假\请假登记\uFrmGuideSign.dfm</Transaction>
+    <Transaction>2013-10-10 13:17:08.000.pas,E:\运安系统\指导队签到\Source\功能窗口\请销假\请销假记录查询\uFrmLeaveQuery.pas=E:\运安系统\指导队签到\Source\功能窗口\请销假\请销假记录查询\uFrmGuideSignQuery.pas</Transaction>
+    <Transaction>2013-10-10 13:17:08.000.dfm,E:\运安系统\指导队签到\Source\功能窗口\请销假\请销假记录查询\uFrmLeaveQuery.dfm=E:\运安系统\指导队签到\Source\功能窗口\请销假\请销假记录查询\uFrmGuideSignQuery.dfm</Transaction>
+    <Transaction>2013-10-11 13:42:00.406.pas,E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmMain_ChuQin.pas=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmGuideSign.pas</Transaction>
+    <Transaction>2013-10-11 13:42:00.406.dfm,E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmMain_ChuQin.dfm=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmGuideSign.dfm</Transaction>
+    <Transaction>2013-10-18 22:43:26.885.pas,E:\运安系统\指导队签到\Source\Unit1.pas=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmSysParam.pas</Transaction>
+    <Transaction>2013-10-18 22:43:26.885.dfm,E:\运安系统\指导队签到\Source\Unit1.dfm=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmSysParam.dfm</Transaction>
+    <Transaction>2013-10-19 10:27:03.765.pas,E:\运安系统\指导队签到\Source\Unit1.pas=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmGuideGroup.pas</Transaction>
+    <Transaction>2013-10-19 10:27:03.765.dfm,E:\运安系统\指导队签到\Source\Unit1.dfm=E:\运安系统\指导队签到\Source\功能窗口\指导队签到\uFrmGuideGroup.dfm</Transaction>
+    <Transaction>2013-10-21 09:58:27.734.bdsproj,E:\运安系统\升级程序\Source\GuideSign.bdsproj=E:\运安系统\升级程序\Source\AutoUpdate.bdsproj</Transaction>
+    <Transaction>2013-10-21 10:11:16.046.pas,E:\运安系统\升级程序\Source\Unit1.pas=E:\运安系统\升级程序\Source\功能窗口\自动升级\uFrmAutoUpdate.pas</Transaction>
+    <Transaction>2013-10-21 10:11:16.046.dfm,E:\运安系统\升级程序\Source\Unit1.dfm=E:\运安系统\升级程序\Source\功能窗口\自动升级\uFrmAutoUpdate.dfm</Transaction>
+    <Transaction>2013-10-25 09:15:18.250.bdsproj,E:\运安系统\自动升级\客户端升级\Source\AutoUpdate.bdsproj=E:\运安系统\自动升级\客户端升级\Source\Update.bdsproj</Transaction>
+    <Transaction>2013-10-25 09:16:20.921.pas,E:\运安系统\自动升级\客户端升级\Source\功能窗口\自动升级\uFrmAutoUpdate.pas=E:\运安系统\自动升级\客户端升级\Source\功能窗口\自动升级\uFrmUpdate.pas</Transaction>
+    <Transaction>2013-10-25 09:16:20.921.dfm,E:\运安系统\自动升级\客户端升级\Source\功能窗口\自动升级\uFrmAutoUpdate.dfm=E:\运安系统\自动升级\客户端升级\Source\功能窗口\自动升级\uFrmUpdate.dfm</Transaction>
+    <Transaction>2014-04-23 12:36:14.255.pas,E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\客户端升级\Source\数据定义\uAutoUpdate.pas=</Transaction>
+    <Transaction>2014-04-23 12:37:33.768.pas,E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\客户端升级\Source\功能单元\日志\uLogs.pas=</Transaction>
+    <Transaction>2014-04-23 12:39:07.764.pas,E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\客户端升级\Source\Unit1.pas=E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\Souce\公共单元\更新接口\uUpdateInterface.pas</Transaction>
+    <Transaction>2014-04-23 12:39:30.631.pas,E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\Souce\公共单元\更新接口\uUpdateInterface.pas=</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{B9C93BB1-5682-46CF-94DC-346F4FCB6337}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    
+    
+    <Projects>
+      <Projects Name="PatchMaker.exe">PatchMaker.bdsproj</Projects>
+      <Projects Name="Patch.exe">..\..\升级包安装\Source\Patch.bdsproj</Projects>
+      <Projects Name="Update.exe">..\..\客户端升级\Source\Update.bdsproj</Projects>
+      <Projects Name="Targets">PatchMaker.exe Patch.exe Update.exe</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

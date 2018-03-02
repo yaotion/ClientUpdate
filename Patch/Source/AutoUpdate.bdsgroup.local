@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2014-04-23 09:42:16.949.bdsgroup,C:\Users\Administrator\Documents\Borland Studio Projects\ProjectGroup1.bdsgroup=E:\姚新\畅想自动化\软件项目\运用安全信息平台\04_软件工程\02_开发\自动升级\生成升级包\Source\AutoUpdate.bdsgroup</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="PatchMaker.exe"/>
+	</Default.Personality>
+</BorlandProject>

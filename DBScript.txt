@@ -1,0 +1,128 @@
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[TAB_AutoUpdate_Project]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[TAB_AutoUpdate_Project]
+GO
+
+CREATE TABLE [dbo].[TAB_AutoUpdate_Project] (
+	[nid] [bigint] IDENTITY (1, 1) NOT NULL ,
+	[strProjectID] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
+	[strProjectName] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
+	[strProjectBrief] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
+	[strMainExeName] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL 
+) ON [PRIMARY]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[TAB_AutoUpdate_Version]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[TAB_AutoUpdate_Version]
+GO
+
+CREATE TABLE [dbo].[TAB_AutoUpdate_Version] (
+	[nid] [bigint] IDENTITY (1, 1) NOT NULL ,
+	[strProjectID] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
+	[dtCreateTime] [datetime] NULL ,
+	[strProjectVersion] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
+	[strUpdateBrief] [varchar] (2000) COLLATE Chinese_PRC_CI_AS NULL ,
+	[strPackageUrl] [varchar] (2000) COLLATE Chinese_PRC_CI_AS NULL 
+) ON [PRIMARY]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[VIEW_AutoUpdate_Version]') and OBJECTPROPERTY(id, N'IsView') = 1)
+drop view [dbo].[VIEW_AutoUpdate_Version]
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS ON 
+GO
+
+
+CREATE VIEW dbo.VIEW_AutoUpdate_Version
+AS
+SELECT dbo.TAB_AutoUpdate_Version.nid, dbo.TAB_AutoUpdate_Version.strProjectID, 
+      dbo.TAB_AutoUpdate_Version.dtCreateTime, 
+      dbo.TAB_AutoUpdate_Version.strProjectVersion, 
+      dbo.TAB_AutoUpdate_Version.strUpdateBrief, 
+      dbo.TAB_AutoUpdate_Version.strPackageUrl, 
+      dbo.TAB_AutoUpdate_Project.strMainExeName, 
+      dbo.TAB_AutoUpdate_Project.strProjectName
+FROM dbo.TAB_AutoUpdate_Project RIGHT OUTER JOIN
+      dbo.TAB_AutoUpdate_Version ON 
+      dbo.TAB_AutoUpdate_Project.strProjectID = dbo.TAB_AutoUpdate_Version.strProjectID
+
+
+
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+
+
+
+CREATE PROCEDURE [dbo].[soe_web_search]
+@tblName   varchar(255),       -- 表名
+@strGetFields varchar(1000) = '*',  -- 需要返回的列 
+@fldName varchar(255)='',      -- 排序的字段名
+@PageSize   int =10,          -- 页尺寸
+@PageIndex  int = 1,           -- 页码
+@doCount  bit = 0,   -- 返回记录总数, 非 0 值则返回
+@OrderType bit = 0,  -- 设置排序类型, 非 0 值则降序
+@strWhere  varchar(1500) = ''  -- 查询条件 (注意: 不要加 where)
+AS
+declare @strSQL   varchar(5000)       -- 主语句
+declare @strTmp   varchar(110)        -- 临时变量
+declare @strOrder varchar(400)        -- 排序类型
+declare @primarykey varchar(50)       -- 主键名称
+select @primarykey=COLUMN_NAME from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE
+WHERE CONSTRAINT_NAME=(select CONSTRAINT_NAME from INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE CONSTRAINT_TYPE='PRIMARY KEY' AND TABLE_NAME=@tblName)
+if @primarykey is null
+	set @primarykey=@fldName
+if @doCount != 0
+  begin
+    if @strWhere !=''
+    set @strSQL = 'select count(*) as Total from [' + @tblName + '] where '+@strWhere
+    else
+     set @strSQL = 'select count(*)  from [' + @tblName + ']'
+end  
+--以上代码的意思是如果@doCount传递过来的不是0，就执行总数统计。以下的所有代码都是@doCount为0的情况
+else
+begin
+ 
+set @strTmp = ' not in'
+if @OrderType != 0
+begin
+set @strOrder = ' order by [' + @fldName +'] desc'
+--如果@OrderType不是0，就执行降序，这句很重要！
+end
+else
+begin
+    set @strOrder = ' order by [' + @fldName +'] asc'
+end
+ 
+if @PageIndex = 1
+begin
+    if @strWhere != ''   
+    set @strSQL = 'select top ' + str(@PageSize) +' '+@strGetFields+ '  from [' + @tblName + '] where ' + @strWhere + ' ' + @strOrder
+     else
+     set @strSQL = 'select top ' + str(@PageSize) +' '+@strGetFields+ '  from ['+ @tblName + '] '+ @strOrder
+--如果是第一页就执行以上代码，这样会加快执行速度
+end
+else
+begin
+--以下代码赋予了@strSQL以真正执行的SQL代码
+set @strSQL = 'select top ' + str(@PageSize) +' '+@strGetFields+ '  from ['
+    + @tblName + '] where [' + @primarykey + ']' + @strTmp + '(select top ' + str((@PageIndex-1)*@PageSize) + ' ['+ @primarykey + '] from [' + @tblName + ']' + @strOrder + ')'+ @strOrder
+ 
+if @strWhere != ''
+    set @strSQL = 'select top ' + str(@PageSize) +' '+@strGetFields+ '  from ['
+        + @tblName + '] where [' + @primarykey + ']' + @strTmp + '(select top ' + str((@PageIndex-1)*@PageSize) + ' ['
+        + @primarykey + '] from [' + @tblName + '] where ' + @strWhere + ' '
+        + @strOrder + ') and ' + @strWhere + ' ' + @strOrder
+end 
+end  
+--select  @strSQL
+exec (@strSQL)
+
+GO

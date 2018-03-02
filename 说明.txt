@@ -1,0 +1,12 @@
+Update.exe	客户端自动升级程序，Update.ini
+Patch.exe	升级包安装程序，Patch.ini
+PatchMaker.exe	生成升级包程序
+ 
+
+使用说明：
+共有4个文件：Update.exe Update.ini Patch.exe PatchMaker.exe
+1、客户端：必须存在这两个文件Update.exe Update.ini，--Update.ini存放“升级地址、项目ID、版本号、程序名”
+2、制作升级包：必须存在这两个文件PatchMaker.exe Patch.exe，使用PatchMaker.exe时，自动生成Patch.ini到升级包里，自动复制Patch.exe到升级包里
+3、升级包：必须存在这两个文件Patch.exe Patch.ini，--Patch.exe 、Patch.ini由系统自动生成
+
+特别注意：每个项目都有独立的ID，请在项目ID文件中登记

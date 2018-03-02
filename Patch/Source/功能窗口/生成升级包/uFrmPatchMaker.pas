@@ -1,0 +1,513 @@
+unit uFrmPatchMaker;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Buttons, PngCustomButton, ExtCtrls, RzPanel, RzPrgres,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, StrUtils,
+  IniFiles, superobject, {OBRARCompress,} RzEdit, XPMan, {RAR,} Grids, AdvObj,
+  BaseGrid, AdvGrid, RzShellDialogs, uMD5, uTFSystem, uAutoUpdate, VCLUnZip,
+  VCLZip,ShellAPI;
+
+type
+  TFrmPatchMaker = class(TForm)
+    RzPanel1: TRzPanel;
+    RzPanel2: TRzPanel;
+    PngCustomButton1: TPngCustomButton;
+    lblHeadInfo: TLabel;
+    RzPanel3: TRzPanel;
+    btnMake: TButton;
+    btnCancel: TButton;
+    XPManifest1: TXPManifest;
+    grdMain: TAdvStringGrid;
+    prgMain: TRzProgressBar;
+    btnOpen: TButton;
+    SelectFolderDialog: TRzSelectFolderDialog;
+    VCLZip: TVCLZip;
+    lblInfo1: TLabel;
+    lblInfo2: TLabel;
+    lblInfo3: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure btnMakeClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
+    procedure grdMainGetEditorType(Sender: TObject; ACol, ARow: Integer;
+      var AEditor: TEditorType);
+    procedure btnOpenClick(Sender: TObject);
+    procedure grdMainGetAlignment(Sender: TObject; ARow, ACol: Integer;
+      var HAlign: TAlignment; var VAlign: TVAlignment);
+    procedure VCLZipTotalPercentDone(Sender: TObject; Percent: Integer);
+    procedure grdMainCanEditCell(Sender: TObject; ARow, ACol: Integer;
+      var CanEdit: Boolean);
+    procedure grdMainCheckBoxChange(Sender: TObject; ACol, ARow: Integer;
+      State: Boolean);
+    procedure grdMainComboChange(Sender: TObject; ACol, ARow,
+      AItemIndex: Integer; ASelection: string);
+  private
+    { Private declarations }  
+    //文件路径
+    m_strFilePath: string;
+    
+    //INI文件-获得新版本信息的URL
+    m_strGetNewVersionUrl: string;
+    //INI文件-项目ID
+    m_strProjectID: string;
+    //INI文件-项目版本
+    m_strProjectVersion: string;
+    //INI文件-可执行程序名
+    m_strMainExeName: string;
+
+    //提取所选目录下的文件
+    procedure GetFilesToGrid(strPath: string; const nTrunc: integer);
+    //根据文件类型，设置表格行颜色
+    procedure SetGridRowColor(ARow: integer; FileType: TRsFileType);
+  private
+    //读写配置文件
+    function ReadConfigFile(strFile, strSection, strKey: string; strDefault: string=''): string;
+    procedure WriteConfigFile(strFile, strSection, strKey, strValue: string); overload;
+    procedure WriteConfigFile(strFile, strSection, strName, strType, strMD5: string); overload;
+    //压缩文件
+    function Zip(FileList: TStringList; strSrcPath, strDesFile: string): boolean;
+    //清空指定目录下的文件
+    function EmptyDir(strPath: string; bDelDir: boolean=false): boolean;
+  public
+    { Public declarations }  
+    class procedure ShowForm;
+  end;
+
+var
+  FrmPatchMaker: TFrmPatchMaker;
+
+implementation
+
+{$R *.dfm}
+
+class procedure TFrmPatchMaker.ShowForm;
+begin
+  if FrmPatchMaker = nil then
+  begin
+    Application.CreateForm(TFrmPatchMaker, FrmPatchMaker);
+  end;
+  FrmPatchMaker.Show
+end;
+
+procedure TFrmPatchMaker.FormCreate(Sender: TObject);
+begin
+  DoubleBuffered := true; 
+  lblInfo1.Caption := '';    
+  lblInfo2.Caption := '';     
+  lblInfo3.Caption := '';
+  grdMain.Cells[1, 0] := '';
+  grdMain.AddCheckBox(1, 0, False, False);
+  grdMain.SetCheckBoxState(1, 0, False);
+end;
+
+procedure TFrmPatchMaker.btnOpenClick(Sender: TObject);
+var
+  strPath, strFile: string;
+  strGetNewVersionUrl, strProjectID, strProjectVersion, strMainExeName: string;
+begin
+  SelectFolderDialog.SelectedPathName := ReadIniFile(ExtractFilePath(Application.ExeName)+'PatchMaker.ini','System','Path');
+  if SelectFolderDialog.Execute then
+  begin
+    strPath := SelectFolderDialog.SelectedPathName;
+    if strPath[Length(strPath)] <> '\' then strPath := strPath + '\';
+    if not DirectoryExists(strPath) then exit;
+    if LowerCase(strPath) = LowerCase(ExtractFilePath(Application.ExeName)) then
+    begin
+      Box('请不要选择打包程序所在的目录！');
+      exit;
+    end;
+    m_strFilePath := strPath;
+    lblInfo3.Caption := Format('%s', [m_strFilePath]);
+    WriteIniFile(ExtractFilePath(Application.ExeName)+'PatchMaker.ini','System','Path',m_strFilePath);
+
+    {
+    strFile := m_strFilePath + 'Update.ini';
+    if not FileExists(strFile) then
+    begin
+      Box('版本文件“Update.ini”找不到，请检查后重试！'#13#10#13#10+Format('路径：%s', [strFile]));
+      Exit;
+    end;
+    strGetNewVersionUrl := ReadConfigFile(strFile, 'SysConfig', 'GetNewVersionUrl');
+    strProjectID := ReadConfigFile(strFile, 'SysConfig', 'ProjectID');
+    strProjectVersion := ReadConfigFile(strFile, 'SysConfig', 'ProjectVersion');
+    strMainExeName := ReadConfigFile(strFile, 'SysConfig', 'MainExeName');
+    lblInfo1.Caption := Format('项 目 ID:%s  版本号:%s  程序名:%s', [strProjectID, strProjectVersion, strMainExeName]);
+    lblInfo2.Caption := Format('升级地址:%s', [strGetNewVersionUrl]);
+    }
+
+    grdMain.ClearRows(1, grdMain.RowCount - 1);
+    grdMain.ClearCols(999, 999);
+    grdMain.RowCount := 1;
+    grdMain.BeginUpdate;
+    try
+      GetFilesToGrid(strPath, Length(strPath));
+    finally
+      if grdMain.RowCount = 1 then grdMain.RowCount := 2;
+      grdMain.FixedRows := 1;
+      grdMain.EndUpdate;
+    end;
+  end;
+end;
+        
+procedure TFrmPatchMaker.btnMakeClick(Sender: TObject);
+var
+  strFile, strName, strType, strMD5, strPatch: string;
+  strSrcPatchExe, strDesPatchExe, strSrcPatchIni, strDesPatchIni: string;
+  i,nFileIndex: integer;
+  bCheck: boolean;
+  FileList: TStringList;
+begin
+  if grdMain.RowCount = 1 then Exit;
+  strSrcPatchExe := ExtractFilePath(Application.ExeName) + 'Patch.exe';
+  strSrcPatchIni := ExtractFilePath(Application.ExeName) + 'Patch.ini';
+  strDesPatchExe := m_strFilePath + 'Patch.exe';
+  strDesPatchIni := m_strFilePath + 'Patch.ini';
+  if not FileExists(strSrcPatchExe) then
+  begin
+    Box('补丁文件“Patch.exe”找不到，请检查后重试！'#13#10#13#10+Format('路径：%s', [strSrcPatchExe]));
+    Exit;
+  end; 
+  if FileExists(strSrcPatchIni) then DeleteFile(strSrcPatchIni);
+  WriteConfigFile(strSrcPatchIni, 'FileInfo', 'FileCount', '0');
+                        
+  btnMake.Enabled := False;
+  FileList := TStringList.Create;
+  try
+    nFileIndex := 0;
+    //要打包的文件
+    for i := 1 to grdMain.RowCount - 1 do
+    begin
+      strFile := Trim(grdMain.Cells[999, i]);
+      if strFile = '' then Continue;
+      grdMain.GetCheckBoxState(1, i, bCheck);
+      if not bCheck then Continue;
+      strName := Trim(grdMain.Cells[2, i]);
+      strType := Trim(grdMain.Cells[3, i]);
+      strMD5 := RivestFile(strFile);
+      
+      FileList.Add(strFile);
+      Inc(nFileIndex);
+      WriteConfigFile(strSrcPatchIni, 'FileName'+IntToStr(nFileIndex), strName, strType, strMD5);
+    end;
+    if FileList.Count = 0 then
+    begin
+      Box('没有要打包的文件，请检查后重试！');
+      Exit;
+    end;
+    WriteConfigFile(strSrcPatchIni, 'FileInfo', 'FileCount', IntToStr(FileList.Count));
+                        
+    //复制升级程序Patch.exe和配置文件Patch.ini到选择目录
+    if not CopyFile(PChar(strSrcPatchExe), PChar(strDesPatchExe), false) then
+    begin
+      Box('复制文件“Patch.exe”失败，请检查后重试！');
+      Exit;
+    end;
+    FileList.Add(strDesPatchExe);
+
+    if not CopyFile(PChar(strSrcPatchIni), PChar(strDesPatchIni), false) then
+    begin
+      Box('复制文件“Patch.ini”失败，请检查后重试！');
+      Exit;
+    end;
+    FileList.Add(strDesPatchIni); 
+    DeleteFile(strSrcPatchIni); //删除在当前目录创建的Patch.ini
+
+    prgMain.Visible := True;
+    Application.ProcessMessages;
+    try
+      strPatch := ExtractFilePath(Application.ExeName) + 'update.rar';
+      if FileExists(strPatch) then DeleteFile(strPatch);
+      if Zip(FileList, m_strFilePath, strPatch) then
+      begin
+        Box(Format('生成升级包成功，共打包%d个文件，升级包路径：'#13#10#13#10'%s', [FileList.Count, strPatch]));
+        ShellExecute(Handle,'open','Explorer.exe',PChar(ExtractFilePath(strPatch)),nil,1)
+      end
+      else
+        Box('生成升级包失败，请检查后重试！');
+    finally
+      prgMain.Visible := False; 
+    end;
+  finally        
+    btnMake.Enabled := True;
+    FileList.Free;
+  end;
+end;
+
+procedure TFrmPatchMaker.btnCancelClick(Sender: TObject);
+begin
+  Close;
+end;
+       
+procedure TFrmPatchMaker.grdMainCanEditCell(Sender: TObject; ARow,
+  ACol: Integer; var CanEdit: Boolean);
+begin
+  CanEdit := True;
+  if ACol = 2 then
+  begin
+    CanEdit := False;
+    Exit;
+  end;
+  if (ARow > 0) and (Trim(TAdvStringGrid(Sender).Cells[999, ARow]) = '') then
+  begin
+    CanEdit := False;
+    Exit;
+  end;
+end;
+
+procedure TFrmPatchMaker.grdMainCheckBoxChange(Sender: TObject; ACol,
+  ARow: Integer; State: Boolean);  
+var
+  i: integer;
+begin
+  if (ACol = 1) and (ARow = 0) then
+  begin
+    grdMain.BeginUpdate;
+    try
+      for i := 1 to grdMain.RowCount - 1 do
+      begin
+        if Trim(grdMain.Cells[999, i]) <> '' then grdMain.SetCheckBoxState(ACol, i, State);
+      end;
+    finally
+      grdMain.EndUpdate;
+    end;
+  end;
+end;
+
+procedure TFrmPatchMaker.grdMainComboChange(Sender: TObject; ACol, ARow,
+  AItemIndex: Integer; ASelection: string); 
+var
+  FileType: TRsFileType;
+begin
+  FileType := FileTypeNameToType(ASelection);
+  case FileType of
+    ftCommFile:
+    begin
+      grdMain.RowColor[ARow] := clWhite; 
+      grdMain.RowFontColor[ARow] := clBlack;
+    end;
+    ftMainFile:
+    begin
+      grdMain.RowColor[ARow] := clGreen;
+      grdMain.RowFontColor[ARow] := clWhite;
+    end;
+    ftRegFile:
+    begin
+      grdMain.RowColor[ARow] := clYellow;
+      grdMain.RowFontColor[ARow] := clBlack;
+    end;
+    ftDBFile:
+    begin
+      grdMain.RowColor[ARow] := clRed;
+      grdMain.RowFontColor[ARow] := clWhite;
+    end;
+  end;
+end;
+
+procedure TFrmPatchMaker.grdMainGetAlignment(Sender: TObject; ARow,
+  ACol: Integer; var HAlign: TAlignment; var VAlign: TVAlignment);
+begin
+  if (ACol = 0) or (ACol = 1) or (ACol = 3) then HAlign := taCenter;
+end;
+
+procedure TFrmPatchMaker.grdMainGetEditorType(Sender: TObject; ACol,
+  ARow: Integer; var AEditor: TEditorType);
+var
+  strText: string;
+begin
+  //文件类型
+  if ACol = 3 then
+  begin
+    AEditor := edComboList;
+    TAdvStringGrid(Sender).ClearComboString;
+    for strText in TRsFileTypeName do
+    begin
+      TAdvStringGrid(Sender).AddComboString(strText);
+    end;
+  end;
+end;
+   
+procedure TFrmPatchMaker.VCLZipTotalPercentDone(Sender: TObject; Percent: Integer);
+begin
+  prgMain.PartsComplete := Percent * prgMain.TotalParts div 100;
+  Application.ProcessMessages;
+end;
+
+//==============================================================================
+
+function TFrmPatchMaker.ReadConfigFile(strFile, strSection, strKey, strDefault: string): string;
+var
+  Ini:TIniFile;
+begin
+  result := strDefault;
+  Ini := TIniFile.Create(strFile);
+  try
+    result := Ini.ReadString(strSection, strKey, strDefault);
+  finally
+    Ini.Free();
+  end;
+end;
+
+procedure TFrmPatchMaker.WriteConfigFile(strFile, strSection, strKey, strValue: string);   
+var
+  Ini:TIniFile;
+begin
+  Ini := TIniFile.Create(strFile);
+  try
+    Ini.WriteString(strSection, strKey, strValue);
+  finally
+    Ini.Free();
+  end;
+end;
+              
+procedure TFrmPatchMaker.WriteConfigFile(strFile, strSection, strName, strType, strMD5: string);
+var
+  Ini:TIniFile;
+begin
+  Ini := TIniFile.Create(strFile);
+  try
+    Ini.WriteString(strSection, 'Name', strName);
+    Ini.WriteString(strSection, 'Type', strType);
+    Ini.WriteString(strSection, 'MD5', strMD5);
+  finally
+    Ini.Free();
+  end;
+end;
+
+function TFrmPatchMaker.Zip(FileList: TStringList; strSrcPath, strDesFile: string): boolean;
+var
+  i: integer;
+begin
+  result := False;
+  try
+    VCLZip.OverwriteMode:=Always; //总是覆盖模式
+    VCLZip.Recurse := True; //包含下级目录中的文件
+    VCLZip.RelativePaths := True; //是否保持目录结构
+    VCLZip.StorePaths := True; //不保存目录信息
+    VCLZip.RecreateDirs := True; //创建目录
+    VCLZip.Password := '';
+
+    VCLZip.FilesList.Clear;
+    for i := 0 to FileList.Count - 1 do VCLZip.FilesList.Add(FileList[i]);
+
+    VCLZip.RootDir := strSrcPath; //保存路径，如s不指定则保持完成路径
+    VCLZip.ZipName := strDesFile;
+    
+    VCLZip.Zip;
+    result := True;
+  except
+  end;
+end;
+
+function TFrmPatchMaker.EmptyDir(strPath: string; bDelDir: boolean): boolean;
+var
+  SearchRec: TSearchRec;
+  strFile: string;
+begin
+  result := true;
+  if strPath[Length(strPath)] <> '\' then strPath := strPath + '\';
+
+  try
+    if FindFirst(strPath+'*.*', faAnyFile, SearchRec) = 0 then
+    begin
+      repeat
+        if SearchRec.Name = '.' then continue;
+        if SearchRec.Name = '..' then continue;
+        
+        strFile := strPath + SearchRec.Name;
+        if (SearchRec.Attr and faDirectory) = faDirectory then
+        begin
+          EmptyDir(strFile, true);
+        end
+        else
+        begin
+          FileSetAttr(strFile, 0);
+          result := result and DeleteFile(strFile);
+        end;
+      until FindNext(SearchRec) <> 0;
+    end;
+    FindClose(SearchRec);
+    if bDelDir then result := result and RemoveDir(strPath);
+  except
+    result := false;
+  end;
+end;
+
+procedure TFrmPatchMaker.GetFilesToGrid(strPath: string; const nTrunc: integer);
+var
+  SearchRec: TSearchRec;
+  strFile, strExt: string;
+  i: integer;
+  bCheck: boolean;
+  FileType: TRsFileType;
+begin
+  if strPath[Length(strPath)] <> '\' then strPath := strPath + '\';
+  grdMain.GetCheckBoxState(1, 0, bCheck);
+
+  try
+    if FindFirst(strPath+'*.*', faAnyFile, SearchRec) = 0 then
+    begin
+      repeat
+        if SearchRec.Name = '.' then Continue;
+        if SearchRec.Name = '..' then Continue;
+
+        strFile := strPath + SearchRec.Name;
+        if (SearchRec.Attr and faDirectory) = faDirectory then
+        begin
+          GetFilesToGrid(strFile, nTrunc);
+        end
+        else
+        begin
+          if LowerCase(strFile) = LowerCase(m_strFilePath+'Patch.exe') then Continue;
+          if LowerCase(strFile) = LowerCase(m_strFilePath+'Patch.ini') then Continue;
+          i := grdMain.RowCount;
+          grdMain.AddRow;
+          grdMain.AddCheckBox(1, i, False, False);
+          grdMain.Cells[0, i] := IntToStr(i);
+          grdMain.SetCheckBoxState(1, i, bCheck);
+          grdMain.Cells[2, i] := Copy(strFile, nTrunc+1, Length(strFile)-nTrunc);
+
+          FileType := ftCommFile;
+          if LowerCase(ExtractFileExt(SearchRec.Name)) = '.mdb' then FileType := ftDBFile;  
+          if LowerCase(ExtractFileExt(SearchRec.Name)) = '.exe' then FileType := ftMainFile;
+          grdMain.Cells[3, i] := TRsFileTypeName[FileType];
+          SetGridRowColor(i, FileType);
+
+          grdMain.Cells[999, i] := strFile;
+        end;
+        Application.ProcessMessages;
+      until FindNext(SearchRec) <> 0;
+    end;
+    FindClose(SearchRec);
+  except
+  end;
+end;
+
+procedure TFrmPatchMaker.SetGridRowColor(ARow: integer; FileType: TRsFileType);
+begin
+  case FileType of
+  ftCommFile:
+  begin
+    grdMain.RowColor[ARow] := clWhite;
+    grdMain.RowFontColor[ARow] := clBlack;
+  end;
+  ftMainFile:
+  begin
+    grdMain.RowColor[ARow] := clGreen;
+    grdMain.RowFontColor[ARow] := clWhite;
+  end;
+  ftRegFile:
+  begin
+    grdMain.RowColor[ARow] := clYellow;
+    grdMain.RowFontColor[ARow] := clBlack;
+  end;
+  ftDBFile:
+  begin
+    grdMain.RowColor[ARow] := clRed;
+    grdMain.RowFontColor[ARow] := clWhite;
+  end;
+end;
+end;
+
+end.
